@@ -312,6 +312,10 @@ async def create_completion(
         else:
             kwargs["logits_processor"].extend(_min_tokens_logits_processor)
 
+    if await request.is_disconnected():
+        print(f"Disconnected from client (via refresh/close) before llm invoked {request.client}")
+        return llama_cpp.Completion()
+
     iterator_or_completion: Union[
         llama_cpp.CreateCompletionResponse,
         Iterator[llama_cpp.CreateCompletionStreamResponse],
@@ -503,6 +507,11 @@ async def create_chat_completion(
             kwargs["logits_processor"] = _min_tokens_logits_processor
         else:
             kwargs["logits_processor"].extend(_min_tokens_logits_processor)
+    
+    if await request.is_disconnected():
+        print(f"Disconnected from client (via refresh/close) before llm invoked {request.client}")
+        return llama_cpp.ChatCompletion()
+        
 
     iterator_or_completion: Union[
         llama_cpp.ChatCompletion, Iterator[llama_cpp.ChatCompletionChunk]
